@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -46,13 +47,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final route = _resolveInitialRoute(widget.initialRoute);
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, _) {
         return MaterialApp(
           title: 'Muhammad Varian Warrick Portfolio',
           debugShowCheckedModeBanner: false,
-          initialRoute: widget.initialRoute,
+          initialRoute: route,
           onGenerateRoute: _generateRoute,
           themeMode: _controller.themeMode,
           theme: _buildTheme(Brightness.light),
@@ -60,6 +62,15 @@ class _MyAppState extends State<MyApp> {
         );
       },
     );
+  }
+
+  String _resolveInitialRoute(String initialRoute) {
+    if (!kIsWeb || initialRoute != '/') return initialRoute;
+
+    final uri = Uri.base;
+    if (uri.path.isEmpty || uri.path == '/') return '/';
+
+    return uri.path + (uri.hasQuery ? '?${uri.query}' : '');
   }
 
   ThemeData _buildTheme(Brightness brightness) {
