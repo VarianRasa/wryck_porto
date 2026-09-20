@@ -1064,6 +1064,7 @@ class _LanguageToggle extends StatelessWidget {
   final ValueChanged<PortfolioLanguage> onChanged;
   @override
   Widget build(BuildContext context) {
+    final colors = _PanelColors.of(context);
     return Align(
       alignment: Alignment.center,
       child: SegmentedButton<PortfolioLanguage>(
@@ -1073,6 +1074,19 @@ class _LanguageToggle extends StatelessWidget {
         ],
         selected: {language},
         onSelectionChanged: (s) => onChanged(s.first),
+        style: ButtonStyle(
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? colors.ink
+                : colors.muted,
+          ),
+          backgroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.selected)
+                ? colors.selectedSurface
+                : colors.surface,
+          ),
+          side: WidgetStatePropertyAll(BorderSide(color: colors.border)),
+        ),
       ),
     );
   }
@@ -1140,6 +1154,7 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = _PanelColors.of(context);
     if (filled) {
       return FilledButton.icon(
         onPressed: onPressed,
@@ -1148,16 +1163,25 @@ class _ActionButton extends StatelessWidget {
       );
     }
     if (tonal) {
-      return FilledButton.tonalIcon(
+      return FilledButton.icon(
         onPressed: onPressed,
         icon: Icon(icon, size: 16),
         label: Text(label),
+        style: FilledButton.styleFrom(
+          backgroundColor: colors.selectedSurface,
+          foregroundColor: colors.ink,
+          side: BorderSide(color: colors.border),
+        ),
       );
     }
     return OutlinedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 16),
       label: Text(label),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: colors.ink,
+        side: BorderSide(color: colors.border),
+      ),
     );
   }
 }
@@ -1168,6 +1192,7 @@ class _ThemeToggle extends StatelessWidget {
   final ValueChanged<ThemeMode> onChanged;
   @override
   Widget build(BuildContext context) {
+    final colors = _PanelColors.of(context);
     return SegmentedButton<ThemeMode>(
       segments: const [
         ButtonSegment(
@@ -1183,6 +1208,48 @@ class _ThemeToggle extends StatelessWidget {
       ],
       selected: {themeMode},
       onSelectionChanged: (s) => onChanged(s.first),
+      style: ButtonStyle(
+        foregroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? colors.ink
+              : colors.muted,
+        ),
+        backgroundColor: WidgetStateProperty.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? colors.selectedSurface
+              : colors.surface,
+        ),
+        side: WidgetStatePropertyAll(BorderSide(color: colors.border)),
+      ),
+    );
+  }
+}
+
+class _PanelColors {
+  const _PanelColors({
+    required this.ink,
+    required this.muted,
+    required this.surface,
+    required this.selectedSurface,
+    required this.border,
+    required this.field,
+  });
+
+  final Color ink;
+  final Color muted;
+  final Color surface;
+  final Color selectedSurface;
+  final Color border;
+  final Color field;
+
+  static _PanelColors of(BuildContext context) {
+    return const _PanelColors(
+      ink: Color(0xfff4f4f5),
+      muted: Color(0xffd4d4d8),
+      surface: Color(0xff202024),
+      selectedSurface: Color(0xff5f6063),
+      border: Color(0xff8f9094),
+      field: Color(0xfff8f7f0),
     );
   }
 }
@@ -1234,6 +1301,7 @@ class _ControlPanel extends StatelessWidget {
   }
 
   Widget _buildDesktopPanel(BuildContext context, ThemeData theme) {
+    final colors = _PanelColors.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1283,13 +1351,17 @@ class _ControlPanel extends StatelessWidget {
           onPressed: () => Navigator.of(context).pushNamed('/admin'),
           icon: const Icon(Icons.edit_note_rounded, size: 18),
           label: const Text('Edit Panel'),
+          style: FilledButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: Colors.white,
+          ),
         ),
         if (controller.statusMessage != null) ...[
           const SizedBox(height: 10),
           Text(
             controller.statusMessage!,
             style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.primary.withValues(alpha: 0.7),
+              color: colors.muted,
             ),
           ),
         ],
@@ -1342,6 +1414,10 @@ class _ControlPanel extends StatelessWidget {
           onPressed: () => Navigator.of(context).pushNamed('/admin'),
           icon: const Icon(Icons.edit_note_rounded, size: 18),
           label: const Text('Edit Panel'),
+          style: FilledButton.styleFrom(
+            backgroundColor: theme.colorScheme.primary,
+            foregroundColor: Colors.white,
+          ),
         ),
       ],
     );
@@ -1450,6 +1526,7 @@ class _PanelHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = _PanelColors.of(context);
     return Row(
       children: [
         Container(
@@ -1473,6 +1550,7 @@ class _PanelHeader extends StatelessWidget {
               Text(
                 'Navigasi',
                 style: theme.textTheme.titleSmall?.copyWith(
+                  color: colors.ink,
                   fontWeight: FontWeight.w800,
                   height: 1.1,
                 ),
@@ -1480,7 +1558,7 @@ class _PanelHeader extends StatelessWidget {
               Text(
                 'Daftar isi & tools',
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
+                  color: colors.muted,
                   fontSize: 11,
                 ),
               ),
@@ -1491,6 +1569,11 @@ class _PanelHeader extends StatelessWidget {
           tooltip: 'Minimize panel',
           onPressed: onCollapse,
           icon: const Icon(Icons.keyboard_double_arrow_right_rounded, size: 18),
+          style: IconButton.styleFrom(
+            backgroundColor: colors.selectedSurface,
+            foregroundColor: colors.ink,
+            side: BorderSide(color: colors.border),
+          ),
         ),
       ],
     );
@@ -1504,6 +1587,7 @@ class _PanelTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = _PanelColors.of(context);
     final cleanTitle = _cleanPanelText(title);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -1515,11 +1599,11 @@ class _PanelTitle extends StatelessWidget {
             color: theme.colorScheme.primary,
           ),
           const SizedBox(width: 7),
-          Text(
+        Text(
             cleanTitle,
             style: theme.textTheme.labelLarge?.copyWith(
               fontWeight: FontWeight.w800,
-              color: theme.colorScheme.onSurface,
+              color: colors.ink,
             ),
           ),
         ],
@@ -1542,6 +1626,7 @@ class _NavTextButtonState extends State<_NavTextButton> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colors = _PanelColors.of(context);
     final cleanLabel = _formatPanelLabel(_cleanPanelText(widget.label));
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -1560,13 +1645,13 @@ class _NavTextButtonState extends State<_NavTextButton> {
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
               decoration: BoxDecoration(
                 color: _hovered
-                    ? theme.colorScheme.primary.withValues(alpha: 0.08)
-                    : theme.colorScheme.surface.withValues(alpha: 0.34),
+                    ? const Color(0xff2d442f)
+                    : colors.surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: _hovered
-                      ? theme.colorScheme.primary.withValues(alpha: 0.18)
-                      : theme.dividerColor.withValues(alpha: 0.35),
+                      ? theme.colorScheme.primary
+                      : colors.border,
                 ),
               ),
               child: Row(
@@ -1576,9 +1661,8 @@ class _NavTextButtonState extends State<_NavTextButton> {
                     height: 28,
                     decoration: BoxDecoration(
                       color: _hovered
-                          ? theme.colorScheme.primary.withValues(alpha: 0.14)
-                          : theme.colorScheme.surfaceContainerHighest
-                                .withValues(alpha: 0.65),
+                          ? const Color(0xff315b36)
+                          : const Color(0xff3a3b3f),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(
@@ -1586,7 +1670,7 @@ class _NavTextButtonState extends State<_NavTextButton> {
                       size: 16,
                       color: _hovered
                           ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurfaceVariant,
+                          : colors.muted,
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -1598,7 +1682,7 @@ class _NavTextButtonState extends State<_NavTextButton> {
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: _hovered
                             ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurface,
+                            : colors.ink,
                         fontWeight: FontWeight.w700,
                         fontSize: 12.5,
                         height: 1.2,
@@ -1842,6 +1926,7 @@ class _ProjectControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = _PanelColors.of(context);
     return Padding(
       padding: const EdgeInsets.only(top: 4),
       child: Column(
@@ -1850,9 +1935,13 @@ class _ProjectControls extends StatelessWidget {
           TextField(
             controller: controller,
             onChanged: onSearchChanged,
-            decoration: const InputDecoration(
+            style: TextStyle(color: colors.ink),
+            decoration: InputDecoration(
               labelText: 'Search',
-              prefixIcon: Icon(Icons.search_rounded),
+              labelStyle: TextStyle(color: colors.muted),
+              floatingLabelStyle: TextStyle(color: colors.ink),
+              prefixIcon: Icon(Icons.search_rounded, color: colors.muted),
+              fillColor: colors.field,
               isDense: true,
             ),
           ),
@@ -1867,6 +1956,16 @@ class _ProjectControls extends StatelessWidget {
                   selected: selectedFilterId == filter.id,
                   onSelected: (_) => onFilterChanged(filter.id),
                   visualDensity: VisualDensity.compact,
+                  labelStyle: TextStyle(
+                    color: selectedFilterId == filter.id
+                        ? colors.ink
+                        : colors.muted,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  backgroundColor: colors.surface,
+                  selectedColor: colors.selectedSurface,
+                  checkmarkColor: colors.ink,
+                  side: BorderSide(color: colors.border),
                 ),
             ],
           ),
