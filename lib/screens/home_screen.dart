@@ -145,6 +145,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return [...predefinedEntries, ...newEntries];
   }
 
+  List<PortfolioEntry> _entriesForKinds(List<PortfolioEntryKind> kinds) {
+    return _controller.entries
+        .where((entry) => kinds.contains(entry.kind))
+        .toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final projectSection = _controller.sections.firstWhere(
@@ -209,6 +215,12 @@ class _HomeScreenState extends State<HomeScreen> {
             entries: _controller.visibleFeaturedProjects,
             language: _language,
           ),
+          _LewiusIntroSection(language: _language, onContact: _contactMe),
+          _LewiusProcessSection(language: _language),
+          _LewiusExperienceSection(
+            language: _language,
+            entries: _entriesForKinds([PortfolioEntryKind.internship]),
+          ),
           for (final section in _controller.sections)
             KeyedSubtree(
               key: _sectionKey(section.id),
@@ -234,6 +246,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       entriesOverride: _entriesForSection(section),
                     ),
             ),
+          _LewiusToolkitSection(
+            language: _language,
+            entries: _entriesForKinds([
+              PortfolioEntryKind.skill,
+              PortfolioEntryKind.certification,
+              PortfolioEntryKind.tools,
+              PortfolioEntryKind.language,
+            ]),
+          ),
+          _LewiusCtaSection(
+            language: _language,
+            onContact: _contactMe,
+            onCopyEmail: _copyEmail,
+          ),
         ],
       ),
     );
@@ -276,26 +302,28 @@ class _HeroSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'MW / PORTFOLIO 2026',
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                    letterSpacing: 1.7,
+                Expanded(
+                  child: Text(
+                    'MW / PORTFOLIO 2026',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      letterSpacing: 1.6,
+                    ),
                   ),
                 ),
-                const Spacer(),
                 _AvailabilityMark(language: language),
               ],
             ),
-            const SizedBox(height: 52),
+            const SizedBox(height: 34),
             if (isWide)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(child: _buildCopy(context, true)),
-                  const SizedBox(width: 38),
-                  SizedBox(width: 188, child: _buildPortraitColumn(context)),
+                  const SizedBox(width: 56),
+                  SizedBox(width: 220, child: _buildPortraitColumn(context)),
                 ],
               )
             else ...[
@@ -303,13 +331,15 @@ class _HeroSection extends StatelessWidget {
               const SizedBox(height: 28),
               _buildCopy(context, false),
             ],
-            const SizedBox(height: 42),
+            const SizedBox(height: 34),
             Divider(color: theme.dividerColor),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
             Row(
               children: [
                 Text(
-                  'SCROLL TO EXPLORE',
+                  language == PortfolioLanguage.en
+                      ? 'SCROLL TO EXPLORE'
+                      : 'GULIR UNTUK MENJELAJAH',
                   style: theme.textTheme.labelSmall?.copyWith(
                     letterSpacing: 1.3,
                     color: theme.colorScheme.onSurfaceVariant,
@@ -336,18 +366,20 @@ class _HeroSection extends StatelessWidget {
       children: [
         Text(
           headline,
-          style: theme.textTheme.labelLarge?.copyWith(
-            color: theme.colorScheme.secondary,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.1,
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
           ),
         ),
         const SizedBox(height: 12),
         Text(
-          title,
+          language == PortfolioLanguage.en
+              ? 'Hi, I’m Muhammad Varian\nWarrick'
+              : 'Hi, saya Muhammad Varian\nWarrick',
           style: theme.textTheme.displayMedium?.copyWith(
-            fontSize: isWide ? 68 : 48,
-            height: 0.97,
+            fontSize: isWide ? 62 : 44,
+            height: 0.98,
+            letterSpacing: -2.8,
           ),
         ),
         const SizedBox(height: 20),
@@ -589,6 +621,431 @@ class _HeroPortrait extends StatelessWidget {
   }
 }
 
+class _LewiusIntroSection extends StatelessWidget {
+  const _LewiusIntroSection({required this.language, required this.onContact});
+
+  final PortfolioLanguage language;
+  final VoidCallback onContact;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 88),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _EditorialEyebrow(
+            text: language == PortfolioLanguage.en
+                ? 'ABOUT / APPROACH'
+                : 'TENTANG / PENDEKATAN',
+          ),
+          const SizedBox(height: 18),
+          Text(
+            language == PortfolioLanguage.en
+                ? 'Turning complex needs into clear, useful digital experiences.'
+                : 'Mengubah kebutuhan yang kompleks menjadi pengalaman digital yang jelas dan berguna.',
+            style: theme.textTheme.headlineLarge?.copyWith(
+              fontSize: 34,
+              height: 1.05,
+              letterSpacing: -1.4,
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            language == PortfolioLanguage.en
+                ? 'I combine information systems thinking, interface design, application development, and data work to shape solutions that people can understand and use.'
+                : 'Saya menggabungkan cara berpikir sistem informasi, desain antarmuka, pengembangan aplikasi, dan pekerjaan data untuk membangun solusi yang mudah dipahami dan digunakan.',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.7,
+            ),
+          ),
+          const SizedBox(height: 22),
+          OutlinedButton.icon(
+            onPressed: onContact,
+            icon: const Icon(Icons.arrow_outward_rounded, size: 16),
+            label: Text(
+              language == PortfolioLanguage.en
+                  ? 'Start a conversation'
+                  : 'Mulai percakapan',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LewiusProcessSection extends StatelessWidget {
+  const _LewiusProcessSection({required this.language});
+
+  final PortfolioLanguage language;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final steps = language == PortfolioLanguage.en
+        ? const [
+            ('01', 'Understand', 'Research, context, and user needs.'),
+            ('02', 'Shape', 'Flows, structure, and visual direction.'),
+            ('03', 'Build', 'Interfaces, prototypes, and working systems.'),
+            ('04', 'Refine', 'Review, iterate, and prepare the handoff.'),
+          ]
+        : const [
+            ('01', 'Pahami', 'Riset, konteks, dan kebutuhan pengguna.'),
+            ('02', 'Rancang', 'Alur, struktur, dan arah visual.'),
+            ('03', 'Bangun', 'Interface, prototype, dan sistem kerja.'),
+            ('04', 'Sempurnakan', 'Review, iterasi, dan persiapan handoff.'),
+          ];
+    return Padding(
+      padding: const EdgeInsets.only(top: 88),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _EditorialEyebrow(
+            text: language == PortfolioLanguage.en
+                ? 'PROCESS / 04 STEPS'
+                : 'PROSES / 04 LANGKAH',
+          ),
+          const SizedBox(height: 18),
+          Text(
+            language == PortfolioLanguage.en
+                ? 'From direction to delivery.'
+                : 'Dari arah hingga solusi siap digunakan.',
+            style: theme.textTheme.headlineMedium?.copyWith(fontSize: 30),
+          ),
+          const SizedBox(height: 24),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 700 ? 4 : 2;
+              final width =
+                  (constraints.maxWidth - (columns - 1) * 12) / columns;
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  for (final step in steps)
+                    SizedBox(
+                      width: width,
+                      child: _ProcessCard(step: step),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProcessCard extends StatelessWidget {
+  const _ProcessCard({required this.step});
+
+  final (String, String, String) step;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(
+          alpha: 0.55,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: theme.dividerColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            step.$1,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(step.$2, style: theme.textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Text(
+            step.$3,
+            style: theme.textTheme.bodySmall?.copyWith(height: 1.5),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LewiusExperienceSection extends StatelessWidget {
+  const _LewiusExperienceSection({
+    required this.language,
+    required this.entries,
+  });
+
+  final PortfolioLanguage language;
+  final List<PortfolioEntry> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 88),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _EditorialEyebrow(
+            text: language == PortfolioLanguage.en
+                ? 'EXPERIENCE'
+                : 'PENGALAMAN',
+          ),
+          const SizedBox(height: 18),
+          Text(
+            language == PortfolioLanguage.en
+                ? 'Building useful systems through collaboration.'
+                : 'Membangun sistem yang berguna melalui kolaborasi.',
+            style: theme.textTheme.headlineMedium?.copyWith(fontSize: 30),
+          ),
+          const SizedBox(height: 24),
+          for (final entry in entries)
+            _ExperienceRow(entry: entry, language: language),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExperienceRow extends StatelessWidget {
+  const _ExperienceRow({required this.entry, required this.language});
+
+  final PortfolioEntry entry;
+  final PortfolioLanguage language;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 18),
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: theme.dividerColor)),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final narrow = constraints.maxWidth < 560;
+          final title = Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                entry.subtitleFor(language) ?? entry.titleFor(language),
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 5),
+              Text(
+                entry.titleFor(language),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          );
+          final description = Text(
+            entry.summaryFor(language),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.55,
+            ),
+          );
+          if (narrow) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                title,
+                const SizedBox(height: 12),
+                description,
+                if (entry.period != null) ...[
+                  const SizedBox(height: 8),
+                  Text(entry.period!, style: theme.textTheme.labelSmall),
+                ],
+              ],
+            );
+          }
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(flex: 3, child: title),
+              const SizedBox(width: 22),
+              Expanded(flex: 5, child: description),
+              const SizedBox(width: 22),
+              SizedBox(
+                width: 120,
+                child: Text(
+                  entry.period ?? '',
+                  textAlign: TextAlign.right,
+                  style: theme.textTheme.labelSmall,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _LewiusToolkitSection extends StatelessWidget {
+  const _LewiusToolkitSection({required this.language, required this.entries});
+
+  final PortfolioLanguage language;
+  final List<PortfolioEntry> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final tags = entries.expand((entry) => entry.tags).toSet().toList();
+    return Padding(
+      padding: const EdgeInsets.only(top: 88),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _EditorialEyebrow(
+            text: language == PortfolioLanguage.en
+                ? 'TOOLKIT / CAPABILITIES'
+                : 'TOOLKIT / KEMAMPUAN',
+          ),
+          const SizedBox(height: 18),
+          Text(
+            language == PortfolioLanguage.en
+                ? 'The tools behind the work.'
+                : 'Tools yang mendukung setiap pekerjaan.',
+            style: theme.textTheme.headlineMedium?.copyWith(fontSize: 30),
+          ),
+          const SizedBox(height: 18),
+          Text(
+            language == PortfolioLanguage.en
+                ? 'A flexible toolkit across design, development, data, documentation, and collaboration.'
+                : 'Toolkit fleksibel untuk desain, pengembangan, data, dokumentasi, dan kolaborasi.',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+              height: 1.65,
+            ),
+          ),
+          const SizedBox(height: 22),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [for (final tag in tags) Chip(label: Text(tag))],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LewiusCtaSection extends StatelessWidget {
+  const _LewiusCtaSection({
+    required this.language,
+    required this.onContact,
+    required this.onCopyEmail,
+  });
+
+  final PortfolioLanguage language;
+  final VoidCallback onContact;
+  final VoidCallback onCopyEmail;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 88),
+      child: Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              language == PortfolioLanguage.en
+                  ? 'Let’s build something useful.'
+                  : 'Mari bangun sesuatu yang berguna.',
+              style: theme.textTheme.headlineMedium?.copyWith(
+                color: theme.colorScheme.onPrimary,
+                fontSize: 32,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              language == PortfolioLanguage.en
+                  ? 'Open to conversations about UI/UX, applications, information systems, and data.'
+                  : 'Terbuka untuk percakapan tentang UI/UX, aplikasi, sistem informasi, dan data.',
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onPrimary.withValues(alpha: 0.78),
+                height: 1.55,
+              ),
+            ),
+            const SizedBox(height: 22),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                FilledButton(
+                  onPressed: onContact,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: theme.colorScheme.onPrimary,
+                    foregroundColor: theme.colorScheme.primary,
+                  ),
+                  child: Text(
+                    language == PortfolioLanguage.en
+                        ? 'Contact me'
+                        : 'Hubungi saya',
+                  ),
+                ),
+                OutlinedButton(
+                  onPressed: onCopyEmail,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    side: BorderSide(
+                      color: theme.colorScheme.onPrimary.withValues(
+                        alpha: 0.45,
+                      ),
+                    ),
+                  ),
+                  child: Text(
+                    language == PortfolioLanguage.en
+                        ? 'Copy email'
+                        : 'Salin email',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _EditorialEyebrow extends StatelessWidget {
+  const _EditorialEyebrow({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+        color: Theme.of(context).colorScheme.primary,
+        letterSpacing: 1.7,
+      ),
+    );
+  }
+}
+
 class _LanguageToggle extends StatelessWidget {
   const _LanguageToggle({required this.language, required this.onChanged});
   final PortfolioLanguage language;
@@ -742,61 +1199,25 @@ class _ControlPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isCompact = MediaQuery.sizeOf(context).width <= 1180;
-    return GlassContainer(
-      neonGlow: !isCompact,
-      padding: EdgeInsets.all(isCompact ? 12 : 14),
-      borderRadius: isCompact ? 16 : 22,
-      child: isCompact
-          ? _buildCompactPanel(context, theme)
-          : _buildDesktopPanel(context, theme),
-    );
-  }
-
-  Widget _buildCompactPanel(BuildContext context, ThemeData theme) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _PanelHeader(onCollapse: onCollapse),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: _LanguageToggle(
-                language: controller.language,
-                onChanged: controller.setLanguage,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: _ThemeToggle(
-                themeMode: controller.themeMode,
-                onChanged: controller.setThemeMode,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        _ProjectControls(
-          controller: searchController,
-          selectedFilterId: controller.selectedFilterId,
-          onSearchChanged: controller.setQuery,
-          onFilterChanged: controller.setFilter,
-        ),
-        const SizedBox(height: 10),
-        _QuickActions(
-          onCopyEmail: onCopyEmail,
-          onOpenCv: onOpenCv,
-          onOpenLinkedIn: onOpenLinkedIn,
-          onContactMe: onContactMe,
-        ),
-        const SizedBox(height: 8),
-        FilledButton.tonalIcon(
-          onPressed: () => Navigator.of(context).pushNamed('/admin'),
-          icon: const Icon(Icons.edit_note_rounded, size: 18),
-          label: const Text('Edit Panel'),
-        ),
-      ],
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xff151515),
+        borderRadius: BorderRadius.circular(isCompact ? 20 : 28),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x26000000),
+            blurRadius: 22,
+            offset: Offset(0, 12),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.all(isCompact ? 12 : 20),
+      child: DefaultTextStyle(
+        style: const TextStyle(color: Color(0xfff4f4f5)),
+        child: isCompact
+            ? _buildCompactPanel(context, theme)
+            : _buildDesktopPanel(context, theme),
+      ),
     );
   }
 
@@ -805,6 +1226,8 @@ class _ControlPanel extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const _PanelProfileCard(),
+        const SizedBox(height: 20),
         _PanelHeader(onCollapse: onCollapse),
         const SizedBox(height: 14),
         _PanelTitle('Daftar Isi'),
@@ -861,6 +1284,56 @@ class _ControlPanel extends StatelessWidget {
       ],
     );
   }
+
+  Widget _buildCompactPanel(BuildContext context, ThemeData theme) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const _PanelProfileCard(compact: true),
+        const SizedBox(height: 12),
+        _PanelHeader(onCollapse: onCollapse),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: _LanguageToggle(
+                language: controller.language,
+                onChanged: controller.setLanguage,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: _ThemeToggle(
+                themeMode: controller.themeMode,
+                onChanged: controller.setThemeMode,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _ProjectControls(
+          controller: searchController,
+          selectedFilterId: controller.selectedFilterId,
+          onSearchChanged: controller.setQuery,
+          onFilterChanged: controller.setFilter,
+        ),
+        const SizedBox(height: 10),
+        _QuickActions(
+          onCopyEmail: onCopyEmail,
+          onOpenCv: onOpenCv,
+          onOpenLinkedIn: onOpenLinkedIn,
+          onContactMe: onContactMe,
+        ),
+        const SizedBox(height: 8),
+        FilledButton.tonalIcon(
+          onPressed: () => Navigator.of(context).pushNamed('/admin'),
+          icon: const Icon(Icons.edit_note_rounded, size: 18),
+          label: const Text('Edit Panel'),
+        ),
+      ],
+    );
+  }
 }
 
 class _CollapsedPanelButton extends StatelessWidget {
@@ -876,6 +1349,83 @@ class _CollapsedPanelButton extends StatelessWidget {
       onPressed: onPressed,
       shape: const CircleBorder(),
       child: const Icon(Icons.tune_rounded),
+    );
+  }
+}
+
+class _PanelProfileCard extends StatelessWidget {
+  const _PanelProfileCard({this.compact = false});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: compact ? 56 : 72,
+          height: compact ? 56 : 72,
+          decoration: BoxDecoration(
+            color: const Color(0xff27272a),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: compact
+              ? const Icon(
+                  Icons.person_outline_rounded,
+                  color: Color(0xffd4d4d8),
+                  size: 28,
+                )
+              : Image.asset(
+                  'assets/images/profile_portrait.png',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const Icon(
+                    Icons.person_outline_rounded,
+                    color: Color(0xffd4d4d8),
+                    size: 32,
+                  ),
+                ),
+        ),
+        const SizedBox(height: 14),
+        Text(
+          'Muhammad Varian Warrick',
+          style: theme.textTheme.titleMedium?.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+          ),
+          child: const Text(
+            'Information Systems · UI/UX',
+            style: TextStyle(
+              color: Color(0xffd4d4d8),
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+        if (!compact) ...[
+          const SizedBox(height: 18),
+          const Text(
+            'Portfolio yang menggabungkan desain antarmuka, pengembangan aplikasi, dan insight berbasis data.',
+            style: TextStyle(
+              color: Color(0xffa1a1aa),
+              fontSize: 12,
+              height: 1.55,
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

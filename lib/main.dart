@@ -61,12 +61,12 @@ class _MyAppState extends State<MyApp> {
 
   ThemeData _buildTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
-    final ink = isDark ? const Color(0xfff1f0e8) : const Color(0xff17201d);
-    final canvas = isDark ? const Color(0xff121614) : const Color(0xfff1f0e8);
-    final panel = isDark ? const Color(0xff1b201d) : const Color(0xfffbfaf4);
-    final lime = isDark ? const Color(0xffc9f36b) : const Color(0xff466629);
-    final muted = isDark ? const Color(0xff9ea99f) : const Color(0xff647069);
-    final accent = isDark ? const Color(0xffffa36f) : const Color(0xffb95f37);
+    final ink = isDark ? const Color(0xfff4f4f5) : const Color(0xff09090b);
+    final canvas = isDark ? const Color(0xff09090b) : Colors.white;
+    final panel = isDark ? const Color(0xff151515) : const Color(0xfff4f4f5);
+    final lime = const Color(0xff09b001);
+    final muted = isDark ? const Color(0xffa1a1aa) : const Color(0xff71717a);
+    final accent = isDark ? const Color(0xffd4d4d8) : const Color(0xff27272a);
     final baseTextTheme = GoogleFonts.spaceGroteskTextTheme(
       isDark ? ThemeData.dark().textTheme : ThemeData.light().textTheme,
     );

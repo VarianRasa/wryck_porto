@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'futuristic_background.dart';
 
 class DocumentShell extends StatelessWidget {
   const DocumentShell({
@@ -19,7 +18,7 @@ class DocumentShell extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: const Color(0xff151515),
       builder: (_) => SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
@@ -33,117 +32,95 @@ class DocumentShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: FuturisticBackground(
-        child: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final showSideNavigation =
-                  sideNavigation != null && constraints.maxWidth > 1120;
-              final compactNavigation =
-                  sideNavigation != null && constraints.maxWidth <= 640;
-              final isWide = constraints.maxWidth > 720;
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isDesktop = constraints.maxWidth >= 1200;
+            final showSidebar = sideNavigation != null && isDesktop;
+            final content = _PageContent(child: child);
 
-              Widget content;
-              if (showSideNavigation) {
-                content = Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1360),
-                    child: SizedBox(
-                      height: constraints.maxHeight,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.fromLTRB(
-                                  24,
-                                  26,
-                                  24,
-                                  56,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.topCenter,
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(
-                                      maxWidth: 970,
-                                    ),
-                                    child: _DocumentPaper(child: child),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 28),
-                            SizedBox(
-                              width: 250,
-                              child: SingleChildScrollView(
-                                padding: const EdgeInsets.fromLTRB(
-                                  0,
-                                  34,
-                                  0,
-                                  40,
-                                ),
-                                child: sideNavigation!,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              } else {
-                content = Center(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: isWide ? 28 : 16,
-                      vertical: isWide ? 24 : 14,
-                    ),
-                    child: Column(
+            if (showSidebar) {
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1440),
+                  child: Padding(
+                    padding: EdgeInsets.all(isDesktop ? 24 : 16),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        if (sideNavigation != null && !compactNavigation) ...[
-                          ConstrainedBox(
-                            constraints: const BoxConstraints(maxWidth: 970),
-                            child: sideNavigation!,
+                        SizedBox(
+                          width: isDesktop ? 272 : 232,
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.only(bottom: 24),
+                            child: sideNavigation,
                           ),
-                          const SizedBox(height: 18),
-                        ],
-                        if (sideNavigation != null && compactNavigation) ...[
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: OutlinedButton.icon(
-                              onPressed: () => _showNavigation(context),
-                              icon: const Icon(Icons.menu_rounded, size: 18),
-                              label: const Text('Menu'),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                        ],
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(maxWidth: 970),
-                          child: _DocumentPaper(child: child),
                         ),
+                        const SizedBox(width: 18),
+                        Expanded(child: content),
                       ],
                     ),
                   ),
-                );
-              }
+                ),
+              );
+            }
 
-              if (floatingSideNavigation == null) return content;
-
-              return Stack(
-                children: [
-                  Positioned.fill(child: content),
+            return Stack(
+              children: [
+                Column(
+                  children: [
+                    if (sideNavigation != null && constraints.maxWidth >= 640)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: sideNavigation!,
+                      ),
+                    if (sideNavigation != null && constraints.maxWidth < 640)
+                      _MobileTopBar(onMenu: () => _showNavigation(context)),
+                    Expanded(child: content),
+                  ],
+                ),
+                if (floatingSideNavigation != null)
                   Positioned(
-                    top: isWide ? 28 : null,
-                    right: isWide ? 24 : 18,
-                    bottom: isWide ? null : 18,
+                    right: 18,
+                    bottom: 18,
                     child: floatingSideNavigation!,
                   ),
-                ],
-              );
-            },
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _PageContent extends StatelessWidget {
+  const _PageContent({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: Theme.of(context).dividerColor),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(28),
+        child: SingleChildScrollView(
+          padding: EdgeInsets.fromLTRB(
+            MediaQuery.sizeOf(context).width < 640 ? 20 : 48,
+            MediaQuery.sizeOf(context).width < 640 ? 24 : 38,
+            MediaQuery.sizeOf(context).width < 640 ? 20 : 48,
+            72,
+          ),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 980),
+              child: child,
+            ),
           ),
         ),
       ),
@@ -151,38 +128,57 @@ class DocumentShell extends StatelessWidget {
   }
 }
 
-class _DocumentPaper extends StatelessWidget {
-  const _DocumentPaper({required this.child});
+class _MobileTopBar extends StatelessWidget {
+  const _MobileTopBar({required this.onMenu});
 
-  final Widget child;
+  final VoidCallback onMenu;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface.withValues(
-          alpha: isDark ? 0.94 : 0.98,
-        ),
-        borderRadius: BorderRadius.circular(5),
-        border: Border.all(
-          color: isDark ? const Color(0xff3a453d) : const Color(0xffd4d5cb),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.07),
-            blurRadius: 30,
-            offset: const Offset(0, 18),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              Icons.grid_view_rounded,
+              color: theme.colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'MW / PORTFOLIO',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                Text(
+                  'CV, projects, and selected work',
+                  style: theme.textTheme.bodySmall,
+                ),
+              ],
+            ),
+          ),
+          IconButton.filledTonal(
+            onPressed: onMenu,
+            tooltip: 'Open menu',
+            icon: const Icon(Icons.menu_rounded),
           ),
         ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(
-          MediaQuery.sizeOf(context).width < 640 ? 20 : 56,
-        ),
-        child: child,
       ),
     );
   }
