@@ -190,30 +190,50 @@ class _EditorialEntryState extends State<_EditorialEntry> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.entry.titleFor(widget.language),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: _hovered
-                                      ? accent
-                                      : theme.colorScheme.onSurface,
-                                ),
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final narrow = constraints.maxWidth < 420;
+                            final title = Text(
+                              widget.entry.titleFor(widget.language),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: _hovered
+                                    ? accent
+                                    : theme.colorScheme.onSurface,
                               ),
-                            ),
-                            if (widget.entry.period != null)
-                              Text(
-                                widget.entry.period!,
-                                textAlign: TextAlign.right,
-                                style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSurfaceVariant,
-                                  letterSpacing: 0,
-                                ),
-                              ),
-                          ],
+                            );
+                            final period = widget.entry.period == null
+                                ? null
+                                : Text(
+                                    widget.entry.period!,
+                                    textAlign: narrow
+                                        ? TextAlign.left
+                                        : TextAlign.right,
+                                    style: theme.textTheme.labelSmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      letterSpacing: 0,
+                                    ),
+                                  );
+                            if (narrow) {
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  title,
+                                  if (period != null) ...[
+                                    const SizedBox(height: 4),
+                                    period,
+                                  ],
+                                ],
+                              );
+                            }
+                            return Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(child: title),
+                                ?period,
+                              ],
+                            );
+                          },
                         ),
                         if (widget.entry.subtitleFor(widget.language) !=
                             null) ...[

@@ -65,8 +65,10 @@ class DocumentShell extends StatelessWidget {
             }
 
             return Stack(
+              fit: StackFit.expand,
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     if (sideNavigation != null && constraints.maxWidth >= 640)
                       Padding(
@@ -108,20 +110,28 @@ class _PageContent extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(28),
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            MediaQuery.sizeOf(context).width < 640 ? 20 : 48,
-            MediaQuery.sizeOf(context).width < 640 ? 24 : 38,
-            MediaQuery.sizeOf(context).width < 640 ? 20 : 48,
-            72,
-          ),
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 980),
-              child: child,
-            ),
-          ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isNarrow = constraints.maxWidth < 640;
+            final horizontalPadding = isNarrow ? 40.0 : 96.0;
+            final contentWidth = (constraints.maxWidth - horizontalPadding)
+                .clamp(0.0, 980.0)
+                .toDouble();
+            return SizedBox.expand(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(
+                  isNarrow ? 20 : 48,
+                  isNarrow ? 24 : 38,
+                  isNarrow ? 20 : 48,
+                  72,
+                ),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: SizedBox(width: contentWidth, child: child),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

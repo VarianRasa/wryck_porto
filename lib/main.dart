@@ -11,7 +11,10 @@ import 'services/firebase_portfolio_backend.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final backend = await FirebasePortfolioBackend.create();
+  final backend = await FirebasePortfolioBackend.create().timeout(
+    const Duration(seconds: 4),
+    onTimeout: () => const DisabledPortfolioBackend(),
+  );
   runApp(MyApp(backend: backend));
 }
 

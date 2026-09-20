@@ -8,8 +8,6 @@ import '../models/portfolio_models.dart';
 import '../widgets/contact_form_dialog.dart';
 import '../widgets/document_shell.dart';
 import '../widgets/entry_link.dart';
-import '../widgets/fade_in_widget.dart';
-import '../widgets/glass_container.dart';
 import '../widgets/portfolio_section_view.dart';
 import '../widgets/section_heading.dart';
 import '../widgets/motion.dart';
@@ -185,30 +183,24 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           KeyedSubtree(key: _profileKey, child: const SizedBox.shrink()),
-          FadeInSlide(
-            delay: const Duration(milliseconds: 60),
-            child: _HeroSection(
-              title: _profileEntry.titleFor(_language),
-              headline: _headline,
-              summary: _summary,
-              language: _language,
-              contactActions: _controller.contactActions,
-              projectCount: _controller.entries
-                  .where((entry) => entry.kind == PortfolioEntryKind.project)
-                  .length,
-              sectionCount: _controller.sections.length,
-              onViewProfile: () => Navigator.of(context).pushNamed(
-                '/detail/profile${_language == PortfolioLanguage.en ? '?lang=en' : ''}',
-              ),
-              onViewProjects: () => _scrollTo(_featuredKey),
+          _HeroSection(
+            title: _profileEntry.titleFor(_language),
+            headline: _headline,
+            summary: _summary,
+            language: _language,
+            contactActions: _controller.contactActions,
+            projectCount: _controller.entries
+                .where((entry) => entry.kind == PortfolioEntryKind.project)
+                .length,
+            sectionCount: _controller.sections.length,
+            onViewProfile: () => Navigator.of(context).pushNamed(
+              '/detail/profile${_language == PortfolioLanguage.en ? '?lang=en' : ''}',
             ),
+            onViewProjects: () => _scrollTo(_featuredKey),
           ),
           const SizedBox(height: 14),
-          FadeInSlide(
-            delay: const Duration(milliseconds: 260),
-            child: _CurrentlyExploring(
-              items: _controller.pageSettings.currentlyExploring,
-            ),
+          _CurrentlyExploring(
+            items: _controller.pageSettings.currentlyExploring,
           ),
           KeyedSubtree(key: _featuredKey, child: const SizedBox.shrink()),
           _FeaturedProjects(
@@ -298,24 +290,44 @@ class _HeroSection extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 720;
+        final isCompact = constraints.maxWidth < 420;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
+            if (isCompact)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
                     'MW / PORTFOLIO 2026',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                       letterSpacing: 1.6,
                     ),
                   ),
-                ),
-                _AvailabilityMark(language: language),
-              ],
-            ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: _AvailabilityMark(language: language),
+                  ),
+                ],
+              )
+            else
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      'MW / PORTFOLIO 2026',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        letterSpacing: 1.6,
+                      ),
+                    ),
+                  ),
+                  _AvailabilityMark(language: language),
+                ],
+              ),
             const SizedBox(height: 34),
             if (isWide)
               Row(
@@ -1382,7 +1394,7 @@ class _PanelProfileCard extends StatelessWidget {
               : Image.asset(
                   'assets/images/profile_portrait.png',
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(
+                  errorBuilder: (_, _, _) => const Icon(
                     Icons.person_outline_rounded,
                     color: Color(0xffd4d4d8),
                     size: 32,
